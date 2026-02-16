@@ -24,15 +24,12 @@ let
     f:
     (symlinkJoin {
       name = "${ghidra.pname}-with-extensions-${lib.getVersion ghidra}";
-      paths = (f allExtensions);
+      paths = [ghidra] ++ (f allExtensions);
       nativeBuildInputs = [
         makeBinaryWrapper
       ]
       ++ lib.optional stdenv.hostPlatform.isDarwin desktopToDarwinBundle;
       postBuild = ''
-        # Prevent attempted creation of plugin lock files in the Nix store.
-        touch $out/lib/ghidra/Ghidra/.dbDirLock
-
         makeWrapper '${ghidra}/bin/ghidra' "$out/bin/ghidra" \
           --set NIX_GHIDRAHOME "$out/lib/ghidra/Ghidra"
         makeWrapper '${ghidra}/bin/ghidra-analyzeHeadless' "$out/bin/ghidra-analyzeHeadless" \
